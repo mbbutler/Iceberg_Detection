@@ -17,25 +17,25 @@ def Threshold(array, thresh_val):
     array[array<thresh_val] = 0
     return array
 
-def Get_Cloud_Mask(band_3, band_5):
+def Get_Cloud_Mask(band_4, band_5):
     is_zero = (band_5==0)
     band_5[is_zero] = 1
-    ratio = np.true_divide(band_3, band_5)
+    ratio = np.true_divide(band_4, band_5)
     ratio[is_zero] = 0
-    band_min = np.amin(ratio)
-    band_mean = np.mean(ratio)
-    band_max = 2*band_mean
-    is_over = (ratio > band_max)
-    ratio = 255*(ratio-band_min)/(band_max-band_min)
-    ratio[is_over] = 255
-    ratio = ratio.astype('B')
+    #band_min = np.amin(ratio)
+    #band_mean = np.mean(ratio)
+    #band_max = 2*band_mean
+    #is_over = (ratio > band_max)
+    #ratio = 255*(ratio-band_min)/(band_max-band_min)
+    #ratio[is_over] = 255
+    #ratio = ratio.astype('B')
     ratio = ndimage.zoom(ratio, 2, order=0)
     ratio = np.delete(ratio, 0, 0)
     ratio = np.delete(ratio, 0, 1)
-    return ratio < 40
+    return ratio > 1
     
     
-# Creates raster mark from vector_fn of ds.
+# Creates raster mask from vector_fn of ds.
 # The rasterized mask is named raster_fn
 def GetMask(ds, raster_fn, vector_fn):
 
@@ -88,17 +88,11 @@ def StitchImages(path):
     os.system(cmd)
 
     files = [f for f in os.listdir(path) if os.path.isfile(path + '/' + f)]
-    print os.listdir(path)
-    print 'path = ' + path
-    print files
-
+   
     while files:
-        print 'files = ', files
-        print 'path = ' + path
         fn = files[0]
         if len(files) == 1:
             cmd = 'mv ' + path + fn + ' ' + save_path + fn[9:16] + '.TIF'
-            print cmd
             os.system(cmd)
         else:
             isStitched = False
@@ -142,19 +136,19 @@ def ProcessFile(path, filename, thresh_value, save_path):
     print "Opening Band 8..."
     ds = gdal.Open(input_file)
 
-    print "Opening Band 3..."
-    ds_3 = gdal.Open(input_file[:-6] + 'B3.TIF')
+    print "Opening Band 4..."
+    ds_4 = gdal.Open(input_file[:-6] + 'B4.TIF')
 
     print "Opening Band 5..."
     ds_5 = gdal.Open(input_file[:-6] + 'B5.TIF')
 
-    band_3 = ds_3.GetRasterBand(1).ReadAsArray()
+    band_4 = ds_4.GetRasterBand(1).ReadAsArray()
     band_5 = ds_5.GetRasterBand(1).ReadAsArray()
 
     print "Creating Cloud Mask Array..."
-    cloud_ind = Get_Cloud_Mask(band_3, band_5)
+    cloud_ind = Get_Cloud_Mask(band_4, band_5)
 
-    ds_3 = None
+    ds_4 = None
     ds_5 = None
 
     print "Apply cloud mask and create new GeoTiff..."
@@ -249,7 +243,6 @@ def ProcessFile(path, filename, thresh_value, save_path):
     ds = None
 
     cmd = 'rm -rf ' + cloud_name + ' ' + cut_name + ' ' + masked_name
-    print cmd
     os.system(cmd)
 ##
 ##    # Use numpy's label function to cluster pixels
