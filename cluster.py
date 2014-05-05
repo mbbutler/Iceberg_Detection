@@ -32,6 +32,9 @@ def Get_Cloud_Mask(band_4, band_5):
     ratio = ndimage.zoom(ratio, 2, order=0)
     ratio = np.delete(ratio, 0, 0)
     ratio = np.delete(ratio, 0, 1)
+    print 'band_min = ', np.amin(ratio)
+    print 'band_max = ', np.amax(ratio)
+    print 'band_mean = ', np.mean(ratio)
     return ratio > 1
     
     
