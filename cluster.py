@@ -19,8 +19,9 @@ def Threshold(array, thresh_val):
 
 def Get_Cloud_Mask(band_3, band_5):
     is_zero = (band_5==0)
-    band_5[is_zero] = 255
+    band_5[is_zero] = 1
     ratio = np.true_divide(band_3, band_5)
+    ratio[is_zero] = 0
     band_min = np.amin(ratio)
     band_mean = np.mean(ratio)
     band_max = 2*band_mean
