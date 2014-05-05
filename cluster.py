@@ -35,7 +35,7 @@ def Get_Cloud_Mask(band_4, band_5):
     print 'band_min = ', np.amin(ratio)
     print 'band_max = ', np.amax(ratio)
     print 'band_mean = ', np.mean(ratio)
-    return ratio > 1
+    return ratio < 1.0
     
     
 # Creates raster mask from vector_fn of ds.
