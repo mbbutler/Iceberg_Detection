@@ -193,7 +193,7 @@ def ProcessFile(path, filename, thresh_value, save_path):
         if irow == 11:
             cut_name = TrimImage(cloud_name, 1980, 0, lrx - (1980 + 3510), lry)
         elif irow == 12:
-            cut_name = TrimImage(cloud_name, 6880, 0, lrx - (688), lry - 8910)
+            cut_name = TrimImage(cloud_name, 6880, 0, lrx - (6880), lry - 8910)
         else:
             print "Wrong row: ", irow
             print "Exiting"
