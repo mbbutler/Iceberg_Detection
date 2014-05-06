@@ -17,25 +17,18 @@ def Threshold(array, thresh_val):
     array[array<thresh_val] = 0
     return array
 
-def Get_Cloud_Mask(band_4, band_5):
-    is_zero = (band_5==0)
-    band_5[is_zero] = 1
-    ratio = np.true_divide(band_4, band_5)
+def Get_Cloud_Mask(band_nir, band_swir):
+    is_zero = (band_swir==0)
+    band_swir[is_zero] = 1
+    ratio = np.true_divide(band_nir, band_swir)
     ratio[is_zero] = 0
-    #band_min = np.amin(ratio)
-    #band_mean = np.mean(ratio)
-    #band_max = 2*band_mean
-    #is_over = (ratio > band_max)
-    #ratio = 255*(ratio-band_min)/(band_max-band_min)
-    #ratio[is_over] = 255
-    #ratio = ratio.astype('B')
     ratio = ndimage.zoom(ratio, 2, order=0)
     ratio = np.delete(ratio, 0, 0)
     ratio = np.delete(ratio, 0, 1)
     print 'band_min = ', np.amin(ratio)
     print 'band_max = ', np.amax(ratio)
     print 'band_mean = ', np.mean(ratio)
-    return ratio < 1.0
+    return ratio < 1
     
     
 # Creates raster mask from vector_fn of ds.
@@ -114,7 +107,10 @@ def StitchImages(path):
         files = [f for f in os.listdir(path) if os.path.isfile(path + '/' + f)]
 
 def ProcessFolder(path, threshold, save_path):
-    
+
+    #Landsat7 Band Designations (note: pan must have twice resolution of nir and swir)
+    pan = "8"
+
     files = [f for f in os.listdir(path) if os.path.isfile(path + '/' + f)]
     folders = [f for f in os.listdir(path) if os.path.isdir(path + '/' + f)]
 
@@ -125,7 +121,7 @@ def ProcessFolder(path, threshold, save_path):
         ProcessFolder(path + '/' + folder, threshold, save_path)
 
     for f in files:
-        if fnmatch.fnmatch(f, '*8.TIF'):
+        if fnmatch.fnmatch(f, '*' + pan + '.TIF'):
             print "Processing File: " + f
             ProcessFile(path, f, threshold, save_path)
 
@@ -136,23 +132,27 @@ def ProcessFile(path, filename, thresh_value, save_path):
 
     input_file = path + '/' + filename
 
-    print "Opening Band 8..."
+    #Landsat7 Band designations
+    nir = "4"
+    swir = "5"
+
+    print "Opening Panchromatic Band..."
     ds = gdal.Open(input_file)
 
-    print "Opening Band 4..."
-    ds_4 = gdal.Open(input_file[:-6] + 'B4.TIF')
+    print "Opening Band " + nir + "..."
+    ds_nir = gdal.Open(input_file[:-6] + 'B' + nir + '.TIF')
 
-    print "Opening Band 5..."
-    ds_5 = gdal.Open(input_file[:-6] + 'B5.TIF')
+    print "Opening Band " + swir + "..."
+    ds_swir = gdal.Open(input_file[:-6] + 'B' + swir + '.TIF')
 
-    band_4 = ds_4.GetRasterBand(1).ReadAsArray()
-    band_5 = ds_5.GetRasterBand(1).ReadAsArray()
+    band_nir = ds_nir.GetRasterBand(1).ReadAsArray()
+    band_swir = ds_swir.GetRasterBand(1).ReadAsArray()
 
     print "Creating Cloud Mask Array..."
-    cloud_ind = Get_Cloud_Mask(band_4, band_5)
+    cloud_ind = Get_Cloud_Mask(band_nir, band_swir)
 
-    ds_4 = None
-    ds_5 = None
+    ds_nir = None
+    ds_swir = None
 
     print "Apply cloud mask and create new GeoTiff..."
     ds_array = ds.GetRasterBand(1).ReadAsArray()
