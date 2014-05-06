@@ -263,7 +263,7 @@ def ProcessFile(path, filename, thresh_value, save_path):
 ####### MAIN #######
 
 if len(sys.argv) != 2:
-    print "Wrong input!"
+    print "Usage is:   python cluster.py [full path of directory to be processed]"
     exit()
     
 path = sys.argv[1]
