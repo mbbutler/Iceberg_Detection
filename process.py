@@ -62,9 +62,9 @@ for f in files:
         icebergs.append(new_iceberg)
 
     db.executemany('INSERT INTO Icebergs VALUES (?,?,?,?)', icebergs)
+    con.commit()
     ds = None
 
-con.commit()
 con.close()
             
 
