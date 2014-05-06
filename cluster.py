@@ -183,17 +183,17 @@ def ProcessFile(path, filename, thresh_value, save_path):
     cut_name = ""
     if ipath == 10:
         if irow == 11:
-            cut_name = TrimImage(cloud_name, 0, 0, lrx - 7700, lry)
+            cut_name = TrimImage(cloud_name, 0, 0, lrx - (7700), lry)
         elif irow == 12:
-            cut_name = TrimImage(cloud_name, 2760, 0, lrx - 2500, lry - 8940)
+            cut_name = TrimImage(cloud_name, 2760, 0, lrx - (2760 + 2500), lry - 8940)
         else:
             print "Wrong row: ", irow
 
     elif ipath == 11:
         if irow == 11:
-            cut_name = TrimImage(cloud_name, 1980, 0, lrx - 3510, lry)
+            cut_name = TrimImage(cloud_name, 1980, 0, lrx - (1980 + 3510), lry)
         elif irow == 12:
-            cut_name = TrimImage(cloud_name, 6880, 0, lrx, lry - 8910)
+            cut_name = TrimImage(cloud_name, 6880, 0, lrx - (688), lry - 8910)
         else:
             print "Wrong row: ", irow
             print "Exiting"
