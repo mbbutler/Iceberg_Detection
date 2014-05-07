@@ -11,11 +11,12 @@ from scipy import ndimage
 
 ############ MAIN ###########
 
-if len(sys.argv) != 2:
-    print "Usage is:   python process.py [full path of directory to be processed]"
+if len(sys.argv) != 3:
+    print "Usage is:   python process.py [full path of directory to be processed] [min size]"
     exit()
     
 path = sys.argv[1]
+min_size = int(sys.argv[2])
 
 if path[-1] != '/':
     path += '/'
@@ -57,15 +58,16 @@ for f in files:
             x_off = x_start + slic[1].start * geo[1]
             array = label_im[slic]
             size = np.count_nonzero(array)
-            y,x = np.nonzero(array)
-            y_avg = np.sum(y)/float(size)
-            x_avg = np.sum(x)/float(size)
-            y_cent = y_off + geo[5]*y_avg
-            x_cent = x_off + geo[1]*x_avg
-            new_iceberg = (day, x_cent, y_cent, size)
-            line = str(day) + ',' + str(x_cent) + ',' + str(y_cent) + ',' + str(size) + '\n'
-            output.write(line)
-            icebergs.append(new_iceberg)
+            if size >= min_size:
+                y,x = np.nonzero(array)
+                y_avg = np.sum(y)/float(size)
+                x_avg = np.sum(x)/float(size)
+                y_cent = y_off + geo[5]*y_avg
+                x_cent = x_off + geo[1]*x_avg
+                new_iceberg = (day, x_cent, y_cent, size)
+                line = str(day) + ',' + str(x_cent) + ',' + str(y_cent) + ',' + str(size) + '\n'
+                output.write(line)
+                icebergs.append(new_iceberg)
 
 ##    db.executemany('INSERT INTO Icebergs VALUES (?,?,?,?)', icebergs)
 ##    con.commit()
