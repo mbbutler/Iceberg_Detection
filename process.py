@@ -20,10 +20,8 @@ min_size = int(sys.argv[2])
 
 if path[-1] != '/':
     path += '/'
-
-# Create and open text output file (use a for append, w for write)
-output = open('text_output.txt', 'w',)
-
+    
+print path
 ##con = lite.connect('test.db')
 ##print 'connected okay'
 ##db = con.cursor()
@@ -37,6 +35,9 @@ files = [f for f in os.listdir(path) if os.path.isfile(path + f)]
 
 for f in files:
     if fnmatch.fnmatch(f, '*.TIF'):
+        # Create and open text output file (use a for append, w for write)
+        output = open(path + f[:-4] + '_clusters.txt', 'w',)
+
         print 'Processing file ', f
         ds = gdal.Open(path + f)
         geo = ds.GetGeoTransform()
