@@ -10,7 +10,8 @@ fname2 = sys.argv[2]
 
 fn1 = open(fname1, 'r')
 fn2 = open(fname2, 'r')
-output = open(fname1[-20:-13] + '_intersected.txt', 'w')
+output = open(fname1[-24:-17] + '_intersected.txt', 'w')
+
 
 for line1 in fn1:
     fn2.seek(0,0)
