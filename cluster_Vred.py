@@ -72,7 +72,7 @@ def TrimImage(cloud_name, ulx, uly, lrx, lry):
 
 
 def MergeImages(img1, img2, new_name):
-    cmd = "gdal_merge.py -o " + new_name + " -ot Byte " + img1 + " " + img2
+    cmd = "gdal_merge.py -o " + new_name + " -n 0 -ot Byte " + img1 + " " + img2
     os.system(cmd)
 
 
@@ -95,20 +95,20 @@ def StitchImages(path):
     while files:
         fn = files[0]
         if len(files) == 1:
-            cmd = 'mv ' + path + fn + ' ' + save_path + fn[9:16] + '.TIF'
+            cmd = 'mv ' + path + fn + ' ' + save_path + fn[9:16] + '_VRd.TIF'
             os.system(cmd)
         else:
             isStitched = False
             for ofn in files[1:]:
                 if fn[9:16] in ofn:
-                    MergeImages(path + fn, path + ofn, save_path + fn[9:16] + '.TIF')
+                    MergeImages(path + fn, path + ofn, save_path + fn[9:16] + '_VRd.TIF')
                     cmd = 'mv ' + path + fn + ' ' + orig_pro_path + fn
                     os.system(cmd)
                     cmd = 'mv ' + path + ofn + ' ' + orig_pro_path + ofn
                     os.system(cmd)
                     isSitched = True
             if not isStitched:
-                cmd = 'mv ' + path + fn + ' ' + save_path + fn[9:16] + '.TIF'
+                cmd = 'mv ' + path + fn + ' ' + save_path + fn[9:16] + '_VRd.TIF'
                 os.system(cmd)
 
         files = [f for f in os.listdir(path) if os.path.isfile(path + '/' + f)]
