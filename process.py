@@ -21,7 +21,6 @@ min_size = int(sys.argv[2])
 if path[-1] != '/':
     path += '/'
     
-print path
 ##con = lite.connect('test.db')
 ##print 'connected okay'
 ##db = con.cursor()
@@ -29,7 +28,6 @@ print path
 ##con.commit()
 ##db.execute('''CREATE TABLE Icebergs(Day INT, X REAL, Y REAL, Size INT)''')
 ##con.commit()
-
 
 files = [f for f in os.listdir(path) if os.path.isfile(path + f)]
 
@@ -52,7 +50,7 @@ for f in files:
         # find_objects returns slices of array that contain each cluster
         iceberg_list = ndimage.find_objects(label_im)
 
-        day = f[:-4]
+        day = f[:-8]
         icebergs = []
         for slic in iceberg_list:
             y_off = y_start + slic[0].start * geo[5]
