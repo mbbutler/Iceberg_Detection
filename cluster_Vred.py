@@ -216,10 +216,15 @@ def ProcessFile(path, filename, thresh_value, save_path):
     # Close original file and open the resized file
     ds = gdal.Open(cut_name)
 
-    # Create rasterized mask from vector file
-    print "Rasterizing vector mask..."
-    mask_ds = GetMask(ds, cut_name[:-4] + "_mask.tif", 'AOI_nofjords_buffered100.shp')
-    print "Vector mask has been rasterized."
+    # Create rasterized ROI from vector file, if it does not already exist
+    if os.path.isfile('AOI_Rasterized.tif'):
+        mask_ds = gdal.Open('AOI_Rasterized.tif')
+        print "Vector file has already been rasterized"
+
+    else:
+        print "Rasterizing vector mask..."
+        mask_ds = GetMask(ds, "AOI_Rasterized.tif", 'AOI_nofjords_buffered100.shp')
+        print "Vector mask has been rasterized."
 
     # Get Mask 2D raster and apply mask
     mask_array = mask_ds.GetRasterBand(1).ReadAsArray()
