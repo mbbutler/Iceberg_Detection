@@ -87,7 +87,9 @@ for f in files:
             hist_temp[i] = temp[1]
             
         a_max = np.amax(hist_temp)
-        hist = np.histogram(hist_temp, a_max)
+        hist, bin_edges = np.histogram(hist_temp, a_max)
+        
+        bin_centers = (bin_edges[:-1] + bin_edges[1:])/2
         
         p0 = [100., 1.]
         coeff, var_matrix = curve_fit(exp_func, np.arange(1, a_max + 1), hist, p0=p0)
@@ -95,10 +97,10 @@ for f in files:
         print 'Fitted Amplitude = ', coeff[0]
         print 'Fitted decay constant = ', coeff[1]
         
-        hist_fit = gauss(np.arange(1,a_max + 1), *coeff)
+        hist_fit = exp_func(bin_centers, *coeff)
         
-        plt.plot(np.arange(1,a_max+ 1), hist, label='Test data')
-        plt.plot(np.arange(1,a_max + 1), hist_fit, label='Fitted data')
+        plt.plot(bin_centers, hist, label='Test data')
+        plt.plot(bin_centers, hist_fit, label='Fitted data')
         plt.show()
 
 
