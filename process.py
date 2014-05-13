@@ -93,7 +93,7 @@ for f in files:
         bin_centers = (bin_edges[:-1] + bin_edges[1:])/2
         
         p0 = [100., 1.]
-        coeff, var_matrix = curve_fit(exp_func, np.arange(1, a_max + 1), hist, p0=p0)
+        coeff, var_matrix = curve_fit(exp_func, bin_centers, hist, p0=p0)
         
         print 'Fitted Amplitude = ', coeff[0]
         print 'Fitted decay constant = ', coeff[1]
