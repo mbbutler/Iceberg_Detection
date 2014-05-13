@@ -8,6 +8,15 @@ import ogr
 import os
 import fnmatch
 from scipy import ndimage
+from scipy.optimize import curve_fit
+
+
+
+def exp_func(x, *p):
+    A, tau = p
+    return A*numpy.exp(-(x)/(tau))
+
+
 
 ############ MAIN ###########
 
@@ -50,6 +59,9 @@ for f in files:
         # find_objects returns slices of array that contain each cluster
         iceberg_list = ndimage.find_objects(label_im)
 
+        temp = np.empty(nb_labels)
+        count = 0
+
         day = f[:-8]
         icebergs = []
         for slic in iceberg_list:
@@ -67,6 +79,23 @@ for f in files:
                 line = str(day) + ',' + str(x_cent) + ',' + str(y_cent) + ',' + str(size) + '\n'
                 output.write(line)
                 icebergs.append(new_iceberg)
+                temp[count] = size
+                count += 1
+             
+        hist_temp = np.empty(count - 1)   
+        for i in range(count - 1):
+            hist_temp[i] = temp[1]
+            
+        a_max = np.amax(hist_temp)
+        a_min =  np.amin(hist_temp)
+        hist = np.histogram(hist_temp, (a_max-a_min) )
+        
+        p0 = [100., 1.]
+        coeff, var_matrix = curve_fit(exp_func, np.arange(1, a_max), hist, p0=p0)
+        
+        print 'Fitted Amplitude = ', coeff[0]
+        print 'Fitted decay constant = ', coeff[1]
+
 
 ##    db.executemany('INSERT INTO Icebergs VALUES (?,?,?,?)', icebergs)
 ##    con.commit()
