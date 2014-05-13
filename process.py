@@ -1,4 +1,5 @@
 import sqlite3 as lite
+import matplotlib.pyplot as plt
 import sys
 from osgeo import gdal, gdalnumeric
 from osgeo import *
