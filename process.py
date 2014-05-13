@@ -95,6 +95,10 @@ for f in files:
         
         print 'Fitted Amplitude = ', coeff[0]
         print 'Fitted decay constant = ', coeff[1]
+        
+        plt.plot(np.arange(1,a_max), hist, label='Test data')
+        plt.plot(np.arange(1,a_max), hist_fit, label='Fitted data')
+        plt.show()
 
 
 ##    db.executemany('INSERT INTO Icebergs VALUES (?,?,?,?)', icebergs)
