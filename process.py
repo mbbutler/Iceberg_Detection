@@ -87,17 +87,18 @@ for f in files:
             hist_temp[i] = temp[1]
             
         a_max = np.amax(hist_temp)
-        a_min =  np.amin(hist_temp)
-        hist = np.histogram(hist_temp, (a_max-a_min) )
+        hist = np.histogram(hist_temp, a_max)
         
         p0 = [100., 1.]
-        coeff, var_matrix = curve_fit(exp_func, np.arange(1, a_max), hist, p0=p0)
+        coeff, var_matrix = curve_fit(exp_func, np.arange(1, a_max + 1), hist, p0=p0)
         
         print 'Fitted Amplitude = ', coeff[0]
         print 'Fitted decay constant = ', coeff[1]
         
-        plt.plot(np.arange(1,a_max), hist, label='Test data')
-        plt.plot(np.arange(1,a_max), hist_fit, label='Fitted data')
+        hist_fit = gauss(np.arange(1,a_max + 1), *coeff)
+        
+        plt.plot(np.arange(1,a_max+ 1), hist, label='Test data')
+        plt.plot(np.arange(1,a_max + 1), hist_fit, label='Fitted data')
         plt.show()
 
 
