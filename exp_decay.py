@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 import numpy as np
+import sys
 
 def exp_func(x, *p):
     A, tau = p
@@ -13,7 +14,7 @@ if len(sys.argv) != 2:
     
 fname = sys.argv[1]
 
-hist_temp= np.loadtxt(fname, dtype='uint8', usecols=(3), delimiter=',')
+hist_temp= np.loadtxt(fname, dtype='uint8', usecols=[3], delimiter=',')
 
 a_max = np.amax(hist_temp)
 hist, bin_edges = np.histogram( hist_temp, bins=np.arange(1,a_max+2) )
