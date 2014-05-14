@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
+import numpy as np
 
 def exp_func(x, *p):
     A, tau = p
