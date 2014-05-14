@@ -15,7 +15,7 @@ from scipy.optimize import curve_fit
 
 def exp_func(x, *p):
     A, tau = p
-    return A*numpy.exp(-(x)/(tau))
+    return A*np.exp(-(x)/(tau))
 
 
 
