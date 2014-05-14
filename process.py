@@ -83,12 +83,12 @@ for f in files:
                 temp[count] = size
                 count += 1
              
-        hist_temp = np.empty(count - 1)   
-        for i in range(count - 1):
-            hist_temp[i] = temp[1]
+        hist_temp = np.empty(count)   
+        for i in range(count):
+            hist_temp[i] = temp[i]
             
         a_max = np.amax(hist_temp)
-        hist, bin_edges = np.histogram(hist_temp, a_max)
+        hist, bin_edges = np.histogram( hist_temp, bins=np.arange(1,a_max+2) )
         
         bin_centers = (bin_edges[:-1] + bin_edges[1:])/2
         
