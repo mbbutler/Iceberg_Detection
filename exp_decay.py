@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 import numpy as np
 import sys
+import math
 
 def exp_func(x, *p):
     A, tau = p
@@ -32,9 +33,8 @@ print 'Fitted decay constant = ', coeff[1]
 
 hist_fit = exp_func(bin_centers, *coeff)
 
-error = ((np.mean((hist_fit - hist)**2))/hist_fit.size)**(1/2)
+error = math.sqrt(np.mean((hist_fit - hist)**2))
 
-print np.mean((hist_fit - hist)**2)/hist_fit.size
 print 'RMSE = ', error
 
 plt.plot(bin_centers, hist, label='Test data')
