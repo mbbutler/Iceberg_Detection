@@ -45,11 +45,15 @@ def GetMask(ds, raster_fn, vector_fn):
     # Create the mask geotiff
     mask_ds = gdal.GetDriverByName('GTiff').Create(raster_fn, ds.RasterXSize, ds.RasterYSize, gdal.GDT_Byte)
     mask_ds.SetGeoTransform((geo[0], geo[1], geo[2], geo[3], geo[4], geo[5]))
+    proj = vec_layer.GetSpatialRef()
+    ########### error: argument 2 of type 'char const *'
+    mask_ds.SetProjection(proj)
     band = mask_ds.GetRasterBand(1)
     band.SetNoDataValue(0)
 
     # Rasterize
     gdal.RasterizeLayer(mask_ds, [1], vec_layer, burn_values=[1])
+
 
     vec_ds = None
     return mask_ds
@@ -131,11 +135,14 @@ def ProcessFile(path, filename, thresh_value, save_path):
     # Open Geotif that is to be analyzed
 
     input_file = path + '/' + filename
-    print 'path is ' + path
 
     #Landsat7 Band designations
     nir = "4"
     swir = "5"
+
+    #Landsat8 Band designations
+    #nir = "5"
+    #swir = "6"
 
     print "Opening Panchromatic Band..."
     ds = gdal.Open(input_file)
@@ -211,14 +218,14 @@ def ProcessFile(path, filename, thresh_value, save_path):
     ds = gdal.Open(cut_name)
 
     # Create rasterized ROI from vector file, if it does not already exist
-    if os.path.isfile('AOI_Rasterized.tif'):
-        mask_ds = gdal.Open('AOI_Rasterized.tif')
-        print "Vector file has already been rasterized"
+#    if os.path.isfile('AOI_Rasterized.tif'):
+#        mask_ds = gdal.Open('AOI_Rasterized.tif')
+#        print "Vector file has already been rasterized"
 
-    else:
-        print "Rasterizing vector mask..."
-        mask_ds = GetMask(ds, "AOI_Rasterized.tif", 'AOI_nofjords_buffered100.shp')
-        print "Vector mask has been rasterized."
+#    else:
+    print "Rasterizing vector mask..."
+    mask_ds = GetMask(ds, "AOI_Rasterized.tif", 'AOI_nofjords_buffered100.shp')
+    print "Vector mask has been rasterized."
 
     # Get Mask 2D raster and apply mask
     mask_array = mask_ds.GetRasterBand(1).ReadAsArray()
