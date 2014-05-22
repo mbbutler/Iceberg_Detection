@@ -46,8 +46,7 @@ def GetMask(ds, raster_fn, vector_fn):
     mask_ds = gdal.GetDriverByName('GTiff').Create(raster_fn, ds.RasterXSize, ds.RasterYSize, gdal.GDT_Byte)
     mask_ds.SetGeoTransform((geo[0], geo[1], geo[2], geo[3], geo[4], geo[5]))
     proj = vec_layer.GetSpatialRef()
-    ########### error: argument 2 of type 'char const *'
-    mask_ds.SetProjection(proj)
+    mask_ds.SetProjection(proj.ExportToWkt())
     band = mask_ds.GetRasterBand(1)
     band.SetNoDataValue(0)
 
@@ -112,7 +111,7 @@ def StitchImages(path):
 
 def ProcessFolder(path, threshold, save_path):
 
-    #Landsat7 Band Designations (note: pan must have twice resolution of nir and swir)
+    #Landsat7 and 8 Band Designations (note: pan must have twice resolution of nir and swir)
     pan = "8"
 
     files = [f for f in os.listdir(path) if os.path.isfile(path + '/' + f)]
@@ -139,11 +138,13 @@ def ProcessFile(path, filename, thresh_value, save_path):
     #Landsat7 Band designations
     nir = "4"
     swir = "5"
-
+    print "Using Landsat 7 Band Designations"
+    
     #Landsat8 Band designations
     #nir = "5"
     #swir = "6"
-
+    #print "Using Landsat 8 Band designations"
+    
     print "Opening Panchromatic Band..."
     ds = gdal.Open(input_file)
 
@@ -217,12 +218,7 @@ def ProcessFile(path, filename, thresh_value, save_path):
     # Close original file and open the resized file
     ds = gdal.Open(cut_name)
 
-    # Create rasterized ROI from vector file, if it does not already exist
-#    if os.path.isfile('AOI_Rasterized.tif'):
-#        mask_ds = gdal.Open('AOI_Rasterized.tif')
-#        print "Vector file has already been rasterized"
-
-#    else:
+    # Create rasterized ROI from vector file
     print "Rasterizing vector mask..."
     mask_ds = GetMask(ds, "AOI_Rasterized.tif", 'AOI_nofjords_buffered100.shp')
     print "Vector mask has been rasterized."
@@ -258,8 +254,8 @@ def ProcessFile(path, filename, thresh_value, save_path):
     mask_ds = None
     ds = None
 
-    cmd = 'rm -rf ' + cloud_name + ' ' + cut_name + ' ' + masked_name
-    os.system(cmd)
+###    cmd = 'rm -rf ' + cloud_name + ' ' + cut_name + ' ' + masked_name
+###    os.system(cmd)
 ##
 ##    # Use numpy's label function to cluster pixels
 ##    label_im, nb_labels = ndimage.label(thresh_array)
