@@ -45,8 +45,7 @@ def GetMask(ds, raster_fn, vector_fn):
     # Create the mask geotiff
     mask_ds = gdal.GetDriverByName('GTiff').Create(raster_fn, ds.RasterXSize, ds.RasterYSize, gdal.GDT_Byte)
     mask_ds.SetGeoTransform((geo[0], geo[1], geo[2], geo[3], geo[4], geo[5]))
-    proj = vec_layer.GetSpatialRef()
-    mask_ds.SetProjection(proj.ExportToWkt())
+    mask_ds.SetProjection(ds.GetProjection())
     band = mask_ds.GetRasterBand(1)
     band.SetNoDataValue(0)
 
