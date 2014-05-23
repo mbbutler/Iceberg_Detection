@@ -67,9 +67,58 @@ def TrimImage(cloud_name, ulx, uly, lrx, lry):
 
 
 def MergeImages(img1, img2, new_name):
+    ds = gdal.Open(img1)
+    proj1 = ds.GetProjection()
+    ds = None
+
+    ds = gdal.Open(img2)
+    proj2 = ds.GetProjection()
+    ds = None
+
+    isReproj1 = False
+    isReproj2 = False
+    
+    if proj1 != proj2:
+        
+        fn1 = os.path.basename(img1)
+        row = int(fn1[6:9])
+        if row == 11:
+            isReproj2 = True
+            print "Projections dont match. Reprojecting..."
+            cmd = "gdalwarp -t_srs '+proj=utm +zone=22N +datum=WGS84' " + img2 + " " + img2[:-4] + "_reproj.TIF"
+            print cmd
+            os.system(cmd)
+            img2 = img2[:-4] + "_reproj.TIF"
+            
+        elif row == 12:
+            isReproj1 = True
+            print "Projections dont match. Reprojecting..."
+            cmd = "gdalwarp -t_srs '+proj=utm +zone=22N +datum=WGS84' " + img1 + " " + img1[:-4] + "_reproj.TIF"
+            print cmd
+            os.system(cmd)
+            img1 = img1[:-4] + "_reproj.TIF"
+            
+        else:
+            print "Row is: " + str(row) + ", which is not a valid row. Exiting."
+            exit()
+            
+        
+    print "Merging images."
     cmd = "gdal_merge.py -o " + new_name + " -n 0 -ot Byte " + img1 + " " + img2
+    print cmd
     os.system(cmd)
 
+    if isReproj1:
+        cmd = 'rm ' + img1
+        print cmd
+        os.system(cmd)
+
+    if isReproj2:
+        cmd = 'rm ' + img2
+        print cmd
+        os.system(cmd)
+        
+        
 
 def StitchImages(path):
 
