@@ -49,7 +49,7 @@ def GetMask(ds, raster_fn, vector_fn):
     band = mask_ds.GetRasterBand(1)
     band.SetNoDataValue(0)
 
-    # Rasterize
+    # Rasterize (vector file is rasterized into the projection of the original dataset, ds)
     gdal.RasterizeLayer(mask_ds, [1], vec_layer, burn_values=[1])
 
 
@@ -105,7 +105,7 @@ def MergeImages(img1, img2, new_name):
         
     print "Merging images."
     cmd = "gdal_merge.py -o " + new_name + " -n 0 -ot Byte " + img1 + " " + img2
-    print cmd
+    #print cmd
     os.system(cmd)
 
     if isReproj1:
@@ -284,6 +284,7 @@ def ProcessFile(path, filename, thresh_value, save_path):
     mask_ds = gdal.GetDriverByName('GTiff').Create(masked_name, ds.RasterXSize, ds.RasterYSize, gdal.GDT_Byte)
     mask_ds.SetGeoTransform((geo[0], geo[1], geo[2], geo[3], geo[4], geo[5]))
     mask_ds.GetRasterBand(1).WriteArray(cluster_array)
+    mask_ds.SetProjection(ds.GetProjection())
 
     # Threshold image
     print "Thresholding image..."
@@ -302,8 +303,8 @@ def ProcessFile(path, filename, thresh_value, save_path):
     mask_ds = None
     ds = None
 
-###    cmd = 'rm -rf ' + cloud_name + ' ' + cut_name + ' ' + masked_name
-###    os.system(cmd)
+    cmd = 'rm -rf ' + cloud_name + ' ' + cut_name + ' ' + masked_name
+    os.system(cmd)
 ##
 ##    # Use numpy's label function to cluster pixels
 ##    label_im, nb_labels = ndimage.label(thresh_array)
