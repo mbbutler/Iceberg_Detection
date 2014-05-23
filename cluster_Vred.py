@@ -52,12 +52,11 @@ def GetMask(ds, raster_fn, vector_fn):
     # Create the mask geotiff
     mask_ds = gdal.GetDriverByName('GTiff').Create(raster_fn, ds.RasterXSize, ds.RasterYSize, gdal.GDT_Byte)
     mask_ds.SetGeoTransform((geo[0], geo[1], geo[2], geo[3], geo[4], geo[5]))
-    proj = vec_layer.GetSpatialRef()
-    mask_ds.SetProjection(proj.ExportToWkt())
+    mask_ds.SetProjection(ds.GetProjection())
     band = mask_ds.GetRasterBand(1)
     band.SetNoDataValue(0)
 
-    # Rasterize
+    # Rasterize (vector file is rasterized into the projection of the original dataset, ds)
     gdal.RasterizeLayer(mask_ds, [1], vec_layer, burn_values=[1])
 
     vec_ds = None
@@ -74,8 +73,57 @@ def TrimImage(cloud_name, ulx, uly, lrx, lry):
 
 
 def MergeImages(img1, img2, new_name):
+    ds = gdal.Open(img1)
+    proj1 = ds.GetProjection()
+    ds = None
+
+    ds = gdal.Open(img2)
+    proj2 = ds.GetProjection()
+    ds = None
+
+    isReproj1 = False
+    isReproj2 = False
+    
+    if proj1 != proj2:
+        
+        fn1 = os.path.basename(img1)
+        row = int(fn1[6:9])
+        if row == 11:
+            isReproj2 = True
+            print "Projections dont match. Reprojecting..."
+            cmd = "gdalwarp -t_srs '+proj=utm +zone=22N +datum=WGS84' " + img2 + " " + img2[:-4] + "_reproj.TIF"
+            print cmd
+            os.system(cmd)
+            img2 = img2[:-4] + "_reproj.TIF"
+            
+        elif row == 12:
+            isReproj1 = True
+            print "Projections dont match. Reprojecting..."
+            cmd = "gdalwarp -t_srs '+proj=utm +zone=22N +datum=WGS84' " + img1 + " " + img1[:-4] + "_reproj.TIF"
+            print cmd
+            os.system(cmd)
+            img1 = img1[:-4] + "_reproj.TIF"
+            
+        else:
+            print "Row is: " + str(row) + ", which is not a valid row. Exiting."
+            exit()
+            
+        
+    print "Merging images."
     cmd = "gdal_merge.py -o " + new_name + " -n 0 -ot Byte " + img1 + " " + img2
+    #print cmd
     os.system(cmd)
+
+    if isReproj1:
+        cmd = 'rm ' + img1
+        print cmd
+        os.system(cmd)
+
+    if isReproj2:
+        cmd = 'rm ' + img2
+        print cmd
+        os.system(cmd)
+        
 
 
 def StitchImages(path):
@@ -108,7 +156,7 @@ def StitchImages(path):
                     os.system(cmd)
                     cmd = 'mv ' + path + ofn + ' ' + orig_pro_path + ofn
                     os.system(cmd)
-                    isSitched = True
+                    isStitched = True
             if not isStitched:
                 cmd = 'mv ' + path + fn + ' ' + save_path + fn[9:16] + '_VRd.TIF'
                 os.system(cmd)
@@ -242,6 +290,7 @@ def ProcessFile(path, filename, thresh_value, save_path):
     mask_ds = gdal.GetDriverByName('GTiff').Create(masked_name, ds.RasterXSize, ds.RasterYSize, gdal.GDT_Byte)
     mask_ds.SetGeoTransform((geo[0], geo[1], geo[2], geo[3], geo[4], geo[5]))
     mask_ds.GetRasterBand(1).WriteArray(cluster_array)
+    mask_ds.SetProjection(ds.GetProjection())
 
     # Threshold image
     print "Thresholding image..."
