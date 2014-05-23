@@ -101,7 +101,7 @@ def StitchImages(path):
                     os.system(cmd)
                     cmd = 'mv ' + path + ofn + ' ' + orig_pro_path + ofn
                     os.system(cmd)
-                    isSitched = True
+                    isStitched = True
             if not isStitched:
                 cmd = 'mv ' + path + fn + ' ' + save_path + fn[9:16] + '_NIR.TIF'
                 os.system(cmd)
